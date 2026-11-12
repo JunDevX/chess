@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chess</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23151a24'/%3E%3Ctext x='50' y='74' font-family='Segoe UI Symbol,serif' font-size='66' text-anchor='middle' fill='%23e3b15f'%3E%E2%99%9E%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<svg class="sprite" aria-hidden="true" focusable="false">
+  <symbol id="pc-p" viewBox="0 0 100 100">
+    <circle cx="50" cy="33" r="13"/>
+    <path d="M41 46h18l7 32H34z"/>
+    <rect x="29" y="78" width="42" height="11" rx="5"/>
+  </symbol>
+  <symbol id="pc-r" viewBox="0 0 100 100">
+    <path d="M32 46V28h9v9h6v-9h6v9h6v-9h9v18z"/>
+    <rect x="36" y="46" width="28" height="32" rx="2"/>
+    <rect x="28" y="78" width="44" height="11" rx="5"/>
+  </symbol>
+  <symbol id="pc-n" viewBox="0 0 100 100">
+    <path d="M40 78V57l-9-5 4-9 9 2-2-12 9 6 6-11 6 16c9 6 13 16 13 27v7z"/>
+    <rect x="28" y="78" width="44" height="11" rx="5"/>
+  </symbol>
+  <symbol id="pc-b" viewBox="0 0 100 100">
+    <circle cx="50" cy="19" r="7"/>
+    <path d="M50 27c11 12 16 21 16 30 0 9-7 15-16 15s-16-6-16-15c0-9 5-18 16-30z"/>
+    <rect x="30" y="78" width="40" height="11" rx="5"/>
+  </symbol>
+  <symbol id="pc-q" viewBox="0 0 100 100">
+    <path d="M30 72V38l12 12 8-21 8 21 12-12v34z"/>
+    <rect x="26" y="78" width="48" height="11" rx="5"/>
+  </symbol>
+  <symbol id="pc-k" viewBox="0 0 100 100">
+    <rect x="46" y="12" width="8" height="20" rx="2"/>
+    <rect x="40" y="18" width="20" height="8" rx="2"/>
+    <path d="M30 72V44l10 8 10-18 10 18 10-8v28z"/>
+    <rect x="26" y="78" width="48" height="11" rx="5"/>
+  </symbol>
+</svg>
+
+<section class="screen lobby" id="lobby">
+  <div class="lobby-glow"></div>
+  <div class="lobby-card">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">♞</div>
+      <div class="brand-text">
+        <h1>Chess</h1>
+        <p>шахматы по локальной сети</p>
+      </div>
+    </div>
+
+    <form id="join-form" autocomplete="off" novalidate>
+      <label class="field">
+        <span class="field-label">Ваш ник</span>
+        <span class="nick-row">
+          <span class="avatar avatar-lg" id="lobby-avatar"><span class="avatar-initials">?</span></span>
+          <input id="nickname" name="nickname" maxlength="16" placeholder="Magnus" spellcheck="false" autofocus>
+        </span>
+        <span class="hint">латиница, цифры, «_» или «-», 2–16 символов</span>
+      </label>
+
+      <div class="field">
+        <span class="field-label">Сторона</span>
+        <div class="sides" id="sides">
+          <button type="button" class="side" data-side="w"><i class="side-dot side-w"></i>Белые</button>
+          <button type="button" class="side" data-side="b"><i class="side-dot side-b"></i>Чёрные</button>
+          <button type="button" class="side is-active" data-side="random"><i class="side-dot side-r"></i>Случайно</button>
+        </div>
+      </div>
+
+      <button class="primary" id="join-btn" type="submit">Играть</button>
+      <p class="form-error" id="lobby-error" hidden></p>
+    </form>
+
+    <div class="lobby-foot">
+      <div class="lan-line" id="lan-line">Подключаюсь к серверу…</div>
+      <div class="lan-line muted" id="lan-ip"></div>
+    </div>
+  </div>
+</section>
+
+<section class="screen table" id="table" hidden>
+  <main class="stage">
+    <div class="board-col">
+      <div class="board-top">
+        <div class="turn-chip" id="turn-chip">
+          <i class="turn-dot"></i>
+          <span id="status-text">Ожидание</span>
+        </div>
+        <div class="board-top-right">
+          <span class="move-count" id="move-count">Ходов: 0</span>
+        </div>
+      </div>
+
+      <div class="board-holder">
+        <div class="board" id="board" aria-label="Шахматная доска"></div>
+        <div class="board-overlay" id="overlay" hidden>
+          <div class="overlay-card">
+            <div class="spinner" id="overlay-spinner"></div>
+            <h2 id="overlay-title">Ожидание подключения друга</h2>
+            <p id="overlay-text">Откройте эту ссылку на другом компьютере в той же сети.</p>
+            <div class="link-row" id="link-row">
+              <input id="share-link" readonly spellcheck="false">
+              <button type="button" class="btn ghost" id="copy-link">Копировать</button>
+            </div>
+            <div class="overlay-actions" id="overlay-actions"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <aside class="sidebar">
+      <div class="players">
+        <div class="player" id="player-opp">
+          <span class="avatar" data-role="avatar"><span class="avatar-initials">?</span></span>
+          <div class="player-info">
+            <div class="player-name" data-role="name">Соперник</div>
+            <div class="player-sub" data-role="sub">не подключён</div>
+            <div class="player-taken" data-role="taken"></div>
+          </div>
+          <span class="player-badge" data-role="badge"></span>
+        </div>
+        <div class="player is-self" id="player-self">
+          <span class="avatar" data-role="avatar"><span class="avatar-initials">?</span></span>
+          <div class="player-info">
+            <div class="player-name" data-role="name">Вы</div>
+            <div class="player-sub" data-role="sub">—</div>
+            <div class="player-taken" data-role="taken"></div>
+          </div>
+          <span class="player-badge" data-role="badge">вы</span>
+        </div>
+      </div>
+
+      <div class="moves-wrap">
+        <div class="moves" id="moves"><span class="moves-empty">Ходы появятся здесь</span></div>
+      </div>
+
+      <div class="chat">
+        <div class="chat-head">
+          <span>Чат</span>
+          <button type="button" class="icon-btn" id="btn-sound" title="Звук">Звук: вкл</button>
+        </div>
+        <div class="chat-log" id="chat-log"></div>
+        <form class="chat-form" id="chat-form" autocomplete="off">
+          <input id="chat-input" type="text" maxlength="400" placeholder="Сообщение…">
+          <button type="submit" class="send-btn">Отправить</button>
+        </form>
+      </div>
+
+      <div class="table-actions">
+        <button type="button" class="btn ghost danger" id="btn-resign" hidden>Сдаться</button>
+        <button type="button" class="btn ghost" id="btn-rematch" hidden>Реванш</button>
+        <button type="button" class="btn ghost" id="btn-leave">Выйти</button>
+      </div>
+    </aside>
+  </main>
+</section>
+
+<div class="modal" id="promo-modal" hidden>
+  <div class="modal-card">
+    <h3>Выберите фигуру</h3>
+    <div class="promo-choices" id="promo-choices"></div>
+  </div>
+</div>
+
+<div class="toast-stack" id="toasts"></div>
+
+<script src="engine.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
