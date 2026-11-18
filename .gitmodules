@@ -1,0 +1,3 @@
+[submodule "chessdotcom"]
+	path = chessdotcom
+	url = https://github.com/ChessCom/Chess-Game.git
