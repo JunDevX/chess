@@ -26,7 +26,7 @@ node server.js
 ```
 
 ## Installation with submodules
-1. Check if Node.js is installed ()
+1. Check if Node.js is installed
 ```
 npm -version
 ```
