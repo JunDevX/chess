@@ -25,4 +25,15 @@ npm start
 node server.js
 ```
 
+## Installation with submodules
+1. Check if Node.js is installed ()
+```
+npm -version
+```
+2. If you didn't get any output regarding the Node.js version, simply install it from nodejs.org.
+3. Clone the repository using the GIT command
+```
+git clone --recursive https://github.com/JunDevX/chess.git
+```
+
 ## Star this repository
